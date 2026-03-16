@@ -17,6 +17,8 @@ const orderIdValue = document.getElementById("orderId");
 
 const sizes = document.querySelectorAll(".main-size-card");
 
+const speeds = document.querySelectorAll(".main-speed-card");
+
 let map;
 let mapRoute;
 let calculation;
@@ -35,15 +37,17 @@ ymaps.ready(() => {
   new ymaps.SuggestView("from");
   new ymaps.SuggestView("to");
 
-  sizes.forEach((element) => {
-    element.addEventListener("click", () => {
-      sizes.forEach((c) =>
-        c.classList.toggle(
-          "is-active",
-          c.dataset.value === element.dataset.value,
-        ),
-      );
-      renderInfo();
+  [sizes, speeds].forEach((group) => {
+    group.forEach((element) => {
+      element.addEventListener("click", () => {
+        group.forEach((c) =>
+          c.classList.toggle(
+            "is-active",
+            c.dataset.value === element.dataset.value,
+          ),
+        );
+        renderInfo();
+      });
     });
   });
 
@@ -85,6 +89,13 @@ calcButton.addEventListener("click", () => {
 
         let duration = Math.min(30, 1 + Math.ceil(km / 80));
 
+        const speed = document.querySelector(".main-speed-card.is-active")
+          .dataset.value;
+        if (speed === "fast") {
+          total = Math.ceil(total * 1.15);
+          duration = Math.ceil(duration - duration * 0.3);
+        }
+
         calculation = {
           from: fromInput.value,
           to: toInput.value,
@@ -93,8 +104,8 @@ calcButton.addEventListener("click", () => {
           duration: duration,
           rate: RATES[size],
           total: total,
+          speed: speed,
         };
-        console.log(1);
 
         renderInfo({
           distanceText: `${calculation.distance} км`,
